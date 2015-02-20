@@ -2,20 +2,29 @@ using namespace std;
 
 #include <cstring>
 #include <cstdlib>
+#include <vector>
+#include "parser.h"
+#include "clause.h"
 
-#include <parser.h>
 
-enum heuristic {
+// Assignment data structure
+vector<vector<int>> assignments;
+// Assignment level is assignments[i]
+// The variable assigned at level i is jth of assignments[i][j]
+
+
+// Ignore this enum, this is possibly for later use
+/*enum heuristic {
   // STATIC
   MOM = 0,
   JWS = 1,
   SATZ = 2,
   //DYNAMIC
   DLIS = 3,
-};
+};*/
 
 
-void DPLL(vector<vector<int> > &set_of_clauses) {
+void DPLL(vector<Clause *> &set_of_clauses) {
   // do BCP
   UnitPropogate(set_of_clauses);
   if (set_of_clauses is all "1" clauses now)
@@ -23,21 +32,20 @@ void DPLL(vector<vector<int> > &set_of_clauses) {
   if (set_of_clauses contains a clause that evals to "0") 
     return(UNSAT); // this is a conflict, thhis set of var assignment doesn't satisfy
   // must recurse
+  
+  // Decision step using branch heuristic
   Heuristically choose an unassigned variable x and heuristically choose a value v
     if ( DPLL(set_of_clauses = simplified by setting x=v) == SAT )
       return(SAT);
     else return( DPLL(set_of_clauses = simplified by setting x=-v) );
 }
 
+// This is the BCP proceedure
 void UnitPropogate(vector<vector<int> > &set_of_clauses) {
   while (set_of_clauses contains a unit clause due to literal L) {
     Simplify set_of_clauses by setting variable for L to its required value in all clauses
   }
 }
-
-
-
-
 
 
 int main(int argc, char** argv) {
@@ -54,9 +62,20 @@ int main(int argc, char** argv) {
    // referred to using `clauses[i][j]'.  The expression `clauses.size()'
    // tells you the number of clauses in the benchmark.
    
-   //Solve SAT
-   UnitPropogate(clauses);
-   DPLL(clauses);
+	// Insert into our data structure
+	vector<Clause *> set_of_clauses;
+	// Clause is a vector of literals
+	// Literals are integers either positive or negative
+	// TODO maybe literals need more information to tell if assigned or not?
+	for (int i = 0, int sz = clauses.size(); i < sz; i++) {
+		Clause *cl = new Clause(clauses(i));
+		set_of_clauses.push_back(cl);
+	}
+	
+   // Solve SAT
+   DPLL(set_of_clauses);
+	
+	// TODO output processing
 
    return 0;
 }

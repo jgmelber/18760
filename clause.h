@@ -1,6 +1,11 @@
 #ifndef CLAUSE_H_
 #define CLAUSE_H_
 
+#include <stack>
+#include <vector>
+
+using std::vector;
+
 class Clause {
 
   // Variable descriptions:
@@ -9,35 +14,41 @@ class Clause {
   // label: The name this node shows to the outside world.
   // low: The bdd_node which is the 'low' node
   // high: The bdd_node which is the 'high' node
-  int index;
-  int marked;
-  char label[100];
-  bdd_node* low;
-  bdd_node* high;
+  bool learned;
+  int activity;
+  vector<int> literals;
 
 public:
      
-  // This is the constructor for the bdd_node.
-  bdd_node(int indexIN, char* labelIN, bdd_node* lowIN, 
-	   bdd_node* highIN) {
-    index = indexIN;
-    strcpy(label, labelIN);
-    low = lowIN;
-    high = highIN;
-    marked = false;
+  // This is the constructor for the Clause.
+  Clause() 
+	  : learned(false)
+     , activity(0)
+	  , literals(vector<int>())
+  { }
+  
+  explicit Clause(vector<int> literals) 
+	  : learned(false)
+     , activity(0)
+	  , literals(literals)
+  { }
+  
+  // This is the destructor for the Clause.
+  virtual ~Clause() { }
+  
+  // Will deal with learned, activity later...
+  /*void setLearned(bool learned) {
+     learned = learned;
+  }
+  
+  bool isLearned() {return learned};*/
+  
+  //REQ: literal cannot be 0
+  void addLiteral(int literal) {
+  	  literals.push_back(literal);
   }
     
-  // Returns the index of the current node.
-  inline int getIndex() { return index; }
     
-  // Returns the 'low' BDD of this node.
-  inline bdd_node* getLow() { return low; }
-    
-  // Returns the 'high' BDD of this node
-  inline bdd_node* getHigh() { return high; }
-    
-  // Returns the label of this node.
-  inline char* getLabel() { return label; }   
 
 };
 #endif
