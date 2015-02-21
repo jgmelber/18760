@@ -8,9 +8,14 @@ using namespace std;
 
 
 // Assignment data structure
-vector<vector<int>> assignments;
+vector<vector<int>> _assignments;
 // Assignment level is assignments[i]
 // The variable assigned at level i is jth of assignments[i][j]
+
+// Variable data structure
+// Maybe this should be the sorted linked list structure I have...
+vector<Variable *> _variables;
+// Need this to track whether the variable has been assigned
 
 
 // Ignore this enum, this is possibly for later use
@@ -38,6 +43,22 @@ void DPLL(vector<Clause *> &set_of_clauses) {
     if ( DPLL(set_of_clauses = simplified by setting x=v) == SAT )
       return(SAT);
     else return( DPLL(set_of_clauses = simplified by setting x=-v) );
+}
+
+bool isSatisfied(vector<Clause *> &set_of_clauses) {
+   for (int i = 0, int sz = set_of_clauses.size(); i < sz; i++) {
+   	if (clauseSatisfied( set_of_clauses(i) ))
+	      return true;
+		return false;
+	}
+}
+
+bool clauseSatisfed(Clause *clause) {
+	for (int i = 0, int cl_len = clause->numLiterals(); i < cl_len; i++) {
+      if ( clause->literals(i) ) //Need to check this against variable set to 
+         return true;
+      return false;
+	}
 }
 
 // This is the BCP proceedure

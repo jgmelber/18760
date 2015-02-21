@@ -9,13 +9,12 @@ using std::vector;
 class Clause {
 
   // Variable descriptions:
-  // index: is used to determine variable ordering for the BDD.
-  // marked: used in BDD traversals (for size and print)
-  // label: The name this node shows to the outside world.
-  // low: The bdd_node which is the 'low' node
-  // high: The bdd_node which is the 'high' node
+  // learned: is used to mark if the clause is learned
+  // activity: how often the clause has been in involved in conflicts
+  // literals: the vector of literals 
   bool learned;
   int activity;
+  //vector<Literal> literals;
   vector<int> literals;
 
 public:
@@ -29,7 +28,7 @@ public:
   
   explicit Clause(vector<int> literals) 
 	  : learned(false)
-     , activity(0)
+	  , activity(0)
 	  , literals(literals)
   { }
   
@@ -45,10 +44,90 @@ public:
   
   //REQ: literal cannot be 0
   void addLiteral(int literal) {
+  	  //literals.push_back(Literal(literal));
   	  literals.push_back(literal);
+  }
+  
+  int numLiterals() {
+	  return literals.size();
+  }
+  
+  vector<int> literals() {
+	  return literals;
   }
     
     
 
 };
+
+
+// Will use later
+class Literal
+{
+	int value; // The value of the literal an integer
+	bool watched; // Used to mark if the literal is a watched variable
+	bool direction; //Not sure if used yet
+	
+	public:
+		Literal ()
+			: value(0)
+			, watched(false) 
+		{ }
+		
+		explicit Literal(int value) 
+			: value(value) 
+		{ }
+		
+		virtual ~Literal ();
+		
+		bool isSigned() {
+			return (value > 0) ? true : false;
+		}
+		
+		int variable() {
+			return (value > 0) ? value : -value;
+		}
+		
+		bool isWatched() {
+			return watched;
+		}
+		
+		void setWatched(bool watched) {
+			watched = watched;
+		}
+
+	private:
+		/* data */
+};
+
+// Need this to track whether the variable has been assigned
+class Variable
+{
+	int value;
+	bool setting;
+	int decisionLevel;
+	//vector<int> watchedIn;
+	
+	public:
+		Variable () 
+			: value(0)
+			, setting(true)
+			, decisionLevel(-1)
+		{ }
+		
+		explicit Variable(int value)
+			: value(value)
+			, setting(true)
+			, decisionLevel(-1)
+		{ }
+		
+		// Methods for get and set value
+		
+		// Methods for setting
+		
+		// Methods for decisionLevel
+		
+		virtual ~Variable ();
+};
+
 #endif
