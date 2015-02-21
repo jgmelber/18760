@@ -61,7 +61,7 @@ public:
 };
 
 
-// Will use later
+// Will use later ?
 class Literal
 {
 	int value; // The value of the literal an integer
@@ -121,13 +121,34 @@ class Variable
 			, decisionLevel(-1)
 		{ }
 		
-		// Methods for get and set value
-		
-		// Methods for setting
-		
-		// Methods for decisionLevel
-		
 		virtual ~Variable ();
+		
+		inline bool operator< (const Variable& lhs, const Variable& rhs) { 
+		   return lhs.getValue() < rhs.getValue();
+		}
+		
+		int getValue() {
+			return value;
+		}
+		
+		bool getSetting() {
+			return setting;
+		}
+		
+		void setSetting(bool setting) {
+			setting = setting;
+		}
+		
+		int getDecisionLevel() {
+			return decisionLevel;
+		}
+		
+		void setDecisionLevel(int decisionLevel) {
+			decisionLevel = decisionLevel;
+			// Maybe need to set setting here also?
+		}
+		
+
 };
 
 #endif

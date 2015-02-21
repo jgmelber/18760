@@ -5,6 +5,7 @@ using namespace std;
 #include <vector>
 #include "parser.h"
 #include "clause.h"
+#include "ValliJGM.h"
 
 
 // Assignment data structure
@@ -13,8 +14,9 @@ vector<vector<int>> _assignments;
 // The variable assigned at level i is jth of assignments[i][j]
 
 // Variable data structure
-// Maybe this should be the sorted linked list structure I have...
-vector<Variable *> _variables;
+// Sorted linked list structure I have...
+// Maintains sortedness and only one variable in the structure
+Valli<Variable> _variables;
 // Need this to track whether the variable has been assigned
 
 
@@ -28,23 +30,31 @@ vector<Variable *> _variables;
   DLIS = 3,
 };*/
 
+enum heuristic {
+  // STATIC
+  UNSAT = 0,
+  SAT = 1
+};
+
 
 void DPLL(vector<Clause *> &set_of_clauses) {
   // do BCP
   UnitPropogate(set_of_clauses);
-  if (set_of_clauses is all "1" clauses now)
+  if (isSatisfied(set_of_clauses))
     return(SAT); // you have simplified every clause to be "1"
-  if (set_of_clauses contains a clause that evals to "0") 
+  if (isConflicting(set_of_clauses)) 
     return(UNSAT); // this is a conflict, thhis set of var assignment doesn't satisfy
   // must recurse
   
   // Decision step using branch heuristic
   Heuristically choose an unassigned variable x and heuristically choose a value v
-    if ( DPLL(set_of_clauses = simplified by setting x=v) == SAT )
+	  
+    if ( DPLL(set_of_clauses = simplified by setting x=v) == (SAT) )
       return(SAT);
     else return( DPLL(set_of_clauses = simplified by setting x=-v) );
 }
 
+// Think this is right but need to check
 bool isSatisfied(vector<Clause *> &set_of_clauses) {
    for (int i = 0, int sz = set_of_clauses.size(); i < sz; i++) {
    	if (clauseSatisfied( set_of_clauses(i) ))
@@ -53,11 +63,34 @@ bool isSatisfied(vector<Clause *> &set_of_clauses) {
 	}
 }
 
+// Think this is right but need to check
 bool clauseSatisfed(Clause *clause) {
 	for (int i = 0, int cl_len = clause->numLiterals(); i < cl_len; i++) {
-      if ( clause->literals(i) ) //Need to check this against variable set to 
+		bool litSign = (clause->literals(i) > 0) ? true : false;
+		bool varSetting = *_variables.find(clause->literals(i)).getSetting();
+      if ( (litSign ^ varSign) == 1) //Need to check this 
          return true;
       return false;
+	}
+}
+
+// Think this is right but need to check
+bool isConflicting(vector<Clause *> &set_of_clauses) {
+   for (int i = 0, int sz = set_of_clauses.size(); i < sz; i++) {
+   	if (clauseConflicting( set_of_clauses(i) ))
+	      return false;
+		return true;
+	}
+}
+
+// Think this is right but need to check
+bool clauseConflicting(Clause *clause) {
+	for (int i = 0, int cl_len = clause->numLiterals(); i < cl_len; i++) {
+		bool litSign = (clause->literals(i) > 0) ? true : false;
+		bool varSetting = *_variables.find(clause->literals(i)).getSetting();
+      if ( (litSign ^ varSign) != 0) //Need to check this 
+         return false;
+      return true;
 	}
 }
 
