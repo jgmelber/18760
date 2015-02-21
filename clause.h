@@ -60,7 +60,7 @@ public:
 
 };
 
-
+/*
 // Will use later ?
 class Literal
 {
@@ -96,9 +96,7 @@ class Literal
 			watched = watched;
 		}
 
-	private:
-		/* data */
-};
+};*/
 
 // Need this to track whether the variable has been assigned
 class Variable

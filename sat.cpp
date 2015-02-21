@@ -122,7 +122,7 @@ int main(int argc, char** argv) {
 	// Literals are integers either positive or negative
 	// TODO maybe literals need more information to tell if assigned or not?
 	for (int i = 0, int sz = clauses.size(); i < sz; i++) {
-		Clause *cl = new Clause(clauses(i));
+		Clause cl = Clause(clauses(i));
 		set_of_clauses.push_back(cl);
 	}
 	
