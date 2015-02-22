@@ -76,9 +76,9 @@ bool clauseSatisfed(Clause *clause) {
 bool isConflicting(vector<Clause *> &set_of_clauses) {
    for (int i = 0, int sz = set_of_clauses.size(); i < sz; i++) {
    	if (clauseConflicting( set_of_clauses(i) ))
-	      return false;
+	      return true;
 	}
-		return true;
+		return false;
 }
  
  
