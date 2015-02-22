@@ -55,44 +55,41 @@ void DPLL(vector<Clause *> &set_of_clauses) {
     else return( DPLL(set_of_clauses = simplified by setting x=-v) );
 }
 
-// Think this is right but need to check
 bool isSatisfied(vector<Clause *> &set_of_clauses) {
    for (int i = 0, int sz = set_of_clauses.size(); i < sz; i++) {
    	if (clauseSatisfied( set_of_clauses(i) ))
 	      return true;
-		return false;
 	}
+		return false;
 }
 
-// Think this is right but need to check
 bool clauseSatisfed(Clause *clause) {
 	for (int i = 0, int cl_len = clause->numLiterals(); i < cl_len; i++) {
 		bool litSign = (clause->literals(i) > 0) ? true : false;
 		unsigned varSetting = *_variables.find(clause->literals(i)).getSetting();
-      if ( (litSign ^ varSign) == 1) //Need to check this 
+      if ( (litSign ^ varSign) == 1) 
          return true;
-      return false;
 	}
+      return false;
 }
 
-// Think this is right but need to check
 bool isConflicting(vector<Clause *> &set_of_clauses) {
    for (int i = 0, int sz = set_of_clauses.size(); i < sz; i++) {
    	if (clauseConflicting( set_of_clauses(i) ))
 	      return false;
-		return true;
 	}
+		return true;
 }
-
-// Think this is right but need to check
+ 
+ 
 bool clauseConflicting(Clause *clause) {
 	for (int i = 0, int cl_len = clause->numLiterals(); i < cl_len; i++) {
 		bool litSign = (clause->literals(i) > 0) ? true : false;
 		unsigned varSetting = *_variables.find(clause->literals(i)).getSetting();
-      if ( (litSign ^ varSign) != 0) //Need to check this 
+      if ( (litSign ^ varSign) != 0) 
          return false;
-      return true;
 	}
+      return true;
 }
 
 // This is the BCP proceedure
