@@ -102,20 +102,20 @@ class Literal
 class Variable
 {
 	int value;
-	bool setting;
+	unsigned setting; // Takes values true (1), false (0), and unassigned (2)
 	int decisionLevel;
 	//vector<int> watchedIn;
 	
 	public:
 		Variable () 
 			: value(0)
-			, setting(true)
+			, setting(2)
 			, decisionLevel(-1)
 		{ }
 		
 		explicit Variable(int value)
 			: value(value)
-			, setting(true)
+			, setting(2)
 			, decisionLevel(-1)
 		{ }
 		
@@ -129,11 +129,11 @@ class Variable
 			return value;
 		}
 		
-		bool getSetting() {
+		unsigned getSetting() {
 			return setting;
 		}
 		
-		void setSetting(bool setting) {
+		void setSetting(unsigned setting) {
 			setting = setting;
 		}
 		
@@ -144,6 +144,9 @@ class Variable
 		void setDecisionLevel(int decisionLevel) {
 			decisionLevel = decisionLevel;
 			// Maybe need to set setting here also?
+			if (decisionLevel = -1) {
+				setting = 2;
+			}
 		}
 		
 

@@ -49,7 +49,8 @@ void DPLL(vector<Clause *> &set_of_clauses) {
   // Decision step using branch heuristic
   Heuristically choose an unassigned variable x and heuristically choose a value v
 	  
-    if ( DPLL(set_of_clauses = simplified by setting x=v) == (SAT) )
+	 // DPLL(set_of_clauses = simplified by setting x=v) == (SAT) 
+    if ( DPLL(set_of_clauses) == (SAT) )
       return(SAT);
     else return( DPLL(set_of_clauses = simplified by setting x=-v) );
 }
@@ -67,7 +68,7 @@ bool isSatisfied(vector<Clause *> &set_of_clauses) {
 bool clauseSatisfed(Clause *clause) {
 	for (int i = 0, int cl_len = clause->numLiterals(); i < cl_len; i++) {
 		bool litSign = (clause->literals(i) > 0) ? true : false;
-		bool varSetting = *_variables.find(clause->literals(i)).getSetting();
+		unsigned varSetting = *_variables.find(clause->literals(i)).getSetting();
       if ( (litSign ^ varSign) == 1) //Need to check this 
          return true;
       return false;
@@ -87,7 +88,7 @@ bool isConflicting(vector<Clause *> &set_of_clauses) {
 bool clauseConflicting(Clause *clause) {
 	for (int i = 0, int cl_len = clause->numLiterals(); i < cl_len; i++) {
 		bool litSign = (clause->literals(i) > 0) ? true : false;
-		bool varSetting = *_variables.find(clause->literals(i)).getSetting();
+		unsigned varSetting = *_variables.find(clause->literals(i)).getSetting();
       if ( (litSign ^ varSign) != 0) //Need to check this 
          return false;
       return true;
