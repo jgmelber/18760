@@ -63,14 +63,19 @@ bool isSatisfied(vector<Clause *> &set_of_clauses) {
 		return false;
 }
 
-bool clauseSatisfed(Clause *clause) {
+/*bool clauseSatisfed(Clause *clause) {
 	for (int i = 0, int cl_len = clause->numLiterals(); i < cl_len; i++) {
-		bool litSign = (clause->literals(i) > 0) ? true : false;
-		unsigned varSetting = *_variables.find(clause->literals(i)).getSetting();
+		bool litSign = (clause->literals(i) > 0) ? 0 : 1;
+		int value = (clause->literals(i)) ? clause->literals(i) : -clause->literals(i);
+		unsigned varSetting = *_variables.find(value).getSetting();
       if ( (litSign ^ varSign) == 1) 
          return true;
 	}
       return false;
+}*/
+
+bool clauseSatisfed(Clause *clause) {
+	return (clause->val1 == 1); 
 }
 
 bool isConflicting(vector<Clause *> &set_of_clauses) {
@@ -82,14 +87,23 @@ bool isConflicting(vector<Clause *> &set_of_clauses) {
 }
  
  
-bool clauseConflicting(Clause *clause) {
+/*bool clauseConflicting(Clause *clause) {
 	for (int i = 0, int cl_len = clause->numLiterals(); i < cl_len; i++) {
-		bool litSign = (clause->literals(i) > 0) ? true : false;
-		unsigned varSetting = *_variables.find(clause->literals(i)).getSetting();
+		bool litSign = (clause->literals(i) > 0) ? 0 : 1;
+		int value = (clause->literals(i)) ? clause->literals(i) : -clause->literals(i);
+		unsigned varSetting = *_variables.find(value).getSetting();
       if ( (litSign ^ varSign) != 0) 
          return false;
 	}
       return true;
+}*/
+
+bool clauseConflicting(Clause *clause) {
+	return (clause->val0 == clause->numLiterals());
+}
+
+bool clauseUnit(Clause *clause) {
+	return (clause->val0 == (clause->numLiterals() - 1)) && (clause->val1 == 0);
 }
 
 // This is the BCP proceedure
@@ -118,10 +132,20 @@ int main(int argc, char** argv) {
 	vector<Clause *> set_of_clauses;
 	// Clause is a vector of literals
 	// Literals are integers either positive or negative
-	// TODO maybe literals need more information to tell if assigned or not?
 	for (int i = 0, int sz = clauses.size(); i < sz; i++) {
-		Clause cl = Clause(clauses(i));
+		Clause cl = Clause(clauses[i]);
 		set_of_clauses.push_back(cl);
+	}
+	
+	for (int i = 0, int sz = set_of_clauses.size(); i < sz; i++) {
+		for (int j = 0, int len = set_of_clauses[i]->numLiterals(); j < len; j++) {
+			int literal = set_of_clauses[i]->literals[j];
+			if (literal > 0) {
+				*(_variables.insert(Variable(literal))).getPOS().push_back(set_of_clauses[i]);
+			} else {
+				*(_variables.insert(Variable(-literal))).getNEG().push_back(set_of_clauses[i]);
+			}
+		}
 	}
 	
    // Solve SAT

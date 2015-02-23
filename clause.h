@@ -42,6 +42,10 @@ public:
   
   bool isLearned() {return learned};*/
   
+  // These should be private but this works for now. 
+  unsigned val1 = 0;
+  unsigned val0 = 0;
+  
   //REQ: literal cannot be 0
   void addLiteral(int literal) {
   	  //literals.push_back(Literal(literal));
@@ -52,7 +56,7 @@ public:
 	  return literals.size();
   }
   
-  vector<int> literals() {
+  &vector<int> literals() {
 	  return literals;
   }
     
@@ -104,19 +108,24 @@ class Variable
 	int value;
 	unsigned setting; // Takes values true (1), false (0), and unassigned (2)
 	int decisionLevel;
-	//vector<int> watchedIn;
+	vector<Clause *> POS;
+	vector<Clause *> NEG;
 	
 	public:
 		Variable () 
 			: value(0)
 			, setting(2)
 			, decisionLevel(-1)
+			, POS(vector<Clause *>)
+			, NEG(vector<Clause *>)
 		{ }
 		
 		explicit Variable(int value)
 			: value(value)
 			, setting(2)
 			, decisionLevel(-1)
+			, POS(vector<Clause *>)
+			, NEG(vector<Clause *>)
 		{ }
 		
 		virtual ~Variable ();
@@ -135,6 +144,14 @@ class Variable
 		
 		void setSetting(unsigned setting) {
 			setting = setting;
+		}
+		
+		vector<Clause *> getPOS() {
+			return POS;
+		}
+		
+		vector<Clause *> getNEG() {
+			return NEG;
 		}
 		
 		int getDecisionLevel() {
