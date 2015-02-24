@@ -212,7 +212,17 @@ class Variable
 	 	  for (int i = 0, sz = NEG.size(); i < sz; i++) {
 	 		  ret = ret + NEG[i]->to_string() + " ";
 	 	  }
-	      return ret;
+	      return ret + "\n";
+	   }  
+		
+		string to_short() {
+	 	  string ret = "Variable: ";
+		  stringstream tt;
+		  tt << value;
+		  stringstream set;
+		  set << setting;
+ 		  ret = ret + tt.str() + " Set: " + set.str();
+	     return ret + "\n";
 	   }  
 
 };

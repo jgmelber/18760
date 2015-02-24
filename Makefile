@@ -11,7 +11,7 @@ OBJS=parser.o sat.o
 EXENAME=760sat
 
 # Compile targets
-all: $(OBJS)
+all: clean $(OBJS)
 	g++ $(FLAGS) $(OBJS) -lz -o $(EXENAME)
 parser.o: parser.cpp parser.h
 	g++ $(FLAGS) -c parser.cpp

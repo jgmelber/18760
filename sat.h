@@ -29,7 +29,7 @@ enum outcome {
 class SAT
 {	
 	// Assignment data structure
-	//vector<vector<int> > _assignments;
+	vector<vector<int> > _assignments;
 	// Assignment level is assignments[i]
 	// The variable assigned at level i is jth of assignments[i][j]
 
@@ -44,19 +44,26 @@ class SAT
 public:
 	SAT () 
 		: _decisionLevel(0) 
-		, _variables(Valli<Variable>())	
+		, _variables(Valli<Variable>())
+		, _unitAssigned(stack<int>())	
 	{ }
 	
 	virtual ~SAT () { }
 
 	outcome DPLL(vector<Clause *> &set_of_clauses) {
+	  /*Valli<Variable>::iterator iter = _variables.begin();
+	  Valli<Variable>::iterator end = _variables.end();
+	  while (iter != end) {
+	  	  cout << (*iter).to_short();
+		  iter++;
+	  }*/
 	  // do BCP
 	  //UnitPropogate(set_of_clauses);
 	  if (isSatisfied(set_of_clauses)) {
 		 cout << "SAT!" << endl; 
 	    return (SATISFIED); // you have simplified every clause to be "1"
 	  } else if (isConflicting(set_of_clauses)) {
-		 cout << "UNSAT!" << endl; 
+		 cout << "UNSAT!" << endl;
 	    return (UNSATISFIED); // this is a conflict, this set of var assignment doesn't satisfy
 	  // must recurse
 	  } else if (hasUnit(set_of_clauses)) {
@@ -75,6 +82,7 @@ public:
 	       return(SATISFIED);
 	     } else { 
 	 	  // DPLL(set_of_clauses = simplified by setting x=-v)
+	 		  --_decisionLevel;
 			  int sign = (*variable).getSetting();
 			  (*variable).setSetting( (sign != 1) );
 			  cout << "Reversing setting ..." << endl;
@@ -85,8 +93,7 @@ public:
 	}
 
 	Valli<Variable>::iterator decide(vector<Clause *> &set_of_clauses) {
-		cout << "Deciding ... hmm ..." << endl;
-		_decisionLevel++;
+		++_decisionLevel;
 		/*//JW
 		int variable = 0;
 		int minScore = 1000000000;
@@ -196,10 +203,12 @@ public:
 	}
 
 	void findUnit(vector<Clause *> &set_of_clauses) {
-		_decisionLevel++;
+		++_decisionLevel;
 		for (int i = 0, sz = set_of_clauses.size(); i < sz; i++) {
-			if (clauseUnit(set_of_clauses[i]))
+			if (clauseUnit(set_of_clauses[i])) {
 				findUnitLiteral(set_of_clauses[i]);
+				break;
+			}
 		}
 	}
 
@@ -211,11 +220,12 @@ public:
 			int value = (lit > 0) ? lit : -lit;
 			it = _variables.find(Variable(value));
 		   unsigned varSetting = (*it).getSetting();
-			if (varSetting == 2) {stringstream tt;
+			if (varSetting == 2) {
+				stringstream tt;
 				int value = (*it).getValue();
 	  		   tt << value;
-	 		   cout << "Found: " << tt.str() << endl;
-				sign = (value > 0);
+	 		   cout << "Unit Found: " << tt.str() << endl;
+				sign = (lit > 0);
 				break;
 			}
 		}
