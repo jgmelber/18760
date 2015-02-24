@@ -3,115 +3,14 @@ using namespace std;
 #include <cstring>
 #include <cstdlib>
 #include <vector>
+#include <iostream>
+#include <fstream>
+#include <cstdio>
+#include <sstream>
 #include "parser.h"
 #include "clause.h"
 #include "ValliJGM.h"
-
-
-// Assignment data structure
-vector<vector<int>> _assignments;
-// Assignment level is assignments[i]
-// The variable assigned at level i is jth of assignments[i][j]
-
-// Variable data structure
-// Sorted linked list structure I have...
-// Maintains sortedness and only one variable in the structure
-Valli<Variable> _variables;
-// Need this to track whether the variable has been assigned
-
-
-// Ignore this enum, this is possibly for later use
-/*enum heuristic {
-  // STATIC
-  MOM = 0,
-  JWS = 1,
-  SATZ = 2,
-  //DYNAMIC
-  DLIS = 3,
-};*/
-
-enum heuristic {
-  // STATIC
-  UNSAT = 0,
-  SAT = 1
-};
-
-
-void DPLL(vector<Clause *> &set_of_clauses) {
-  // do BCP
-  UnitPropogate(set_of_clauses);
-  if (isSatisfied(set_of_clauses))
-    return(SAT); // you have simplified every clause to be "1"
-  if (isConflicting(set_of_clauses)) 
-    return(UNSAT); // this is a conflict, thhis set of var assignment doesn't satisfy
-  // must recurse
-  
-  // Decision step using branch heuristic
-  Heuristically choose an unassigned variable x and heuristically choose a value v
-	  
-	 // DPLL(set_of_clauses = simplified by setting x=v) == (SAT) 
-    if ( DPLL(set_of_clauses) == (SAT) )
-      return(SAT);
-    else return( DPLL(set_of_clauses = simplified by setting x=-v) );
-}
-
-bool isSatisfied(vector<Clause *> &set_of_clauses) {
-   for (int i = 0, int sz = set_of_clauses.size(); i < sz; i++) {
-   	if (clauseSatisfied( set_of_clauses(i) ))
-	      return true;
-	}
-		return false;
-}
-
-/*bool clauseSatisfed(Clause *clause) {
-	for (int i = 0, int cl_len = clause->numLiterals(); i < cl_len; i++) {
-		bool litSign = (clause->literals(i) > 0) ? 0 : 1;
-		int value = (clause->literals(i)) ? clause->literals(i) : -clause->literals(i);
-		unsigned varSetting = *_variables.find(value).getSetting();
-      if ( (litSign ^ varSign) == 1) 
-         return true;
-	}
-      return false;
-}*/
-
-bool clauseSatisfed(Clause *clause) {
-	return (clause->val1 == 1); 
-}
-
-bool isConflicting(vector<Clause *> &set_of_clauses) {
-   for (int i = 0, int sz = set_of_clauses.size(); i < sz; i++) {
-   	if (clauseConflicting( set_of_clauses(i) ))
-	      return true;
-	}
-		return false;
-}
- 
- 
-/*bool clauseConflicting(Clause *clause) {
-	for (int i = 0, int cl_len = clause->numLiterals(); i < cl_len; i++) {
-		bool litSign = (clause->literals(i) > 0) ? 0 : 1;
-		int value = (clause->literals(i)) ? clause->literals(i) : -clause->literals(i);
-		unsigned varSetting = *_variables.find(value).getSetting();
-      if ( (litSign ^ varSign) != 0) 
-         return false;
-	}
-      return true;
-}*/
-
-bool clauseConflicting(Clause *clause) {
-	return (clause->val0 == clause->numLiterals());
-}
-
-bool clauseUnit(Clause *clause) {
-	return (clause->val0 == (clause->numLiterals() - 1)) && (clause->val1 == 0);
-}
-
-// This is the BCP proceedure
-void UnitPropogate(vector<vector<int> > &set_of_clauses) {
-  while (set_of_clauses contains a unit clause due to literal L) {
-    Simplify set_of_clauses by setting variable for L to its required value in all clauses
-  }
-}
+#include "sat.h"
 
 
 int main(int argc, char** argv) {
@@ -122,6 +21,7 @@ int main(int argc, char** argv) {
    //This constructs the clauses vector and maxVarIndex int
    vector<vector<int> > clauses;
    int maxVarIndex = 0;
+	// cout << argv[1] << endl;
    parse_DIMACS_CNF(clauses, maxVarIndex, argv[1]);
    // You can refer to the ith clause appearing in the CNF file using the
    // expression `clauses[i]'.  The jth literal of `clauses[i]' can be
@@ -132,26 +32,49 @@ int main(int argc, char** argv) {
 	vector<Clause *> set_of_clauses;
 	// Clause is a vector of literals
 	// Literals are integers either positive or negative
-	for (int i = 0, int sz = clauses.size(); i < sz; i++) {
-		Clause cl = Clause(clauses[i]);
+	for (int i = 0, sz = clauses.size(); i < sz; i++) {
+		Clause *cl = new Clause(clauses[i]);
 		set_of_clauses.push_back(cl);
 	}
+
+	cout << "*******************************************************************" << endl;
+	cout << "************************     STARTING     *************************" << endl;
+	cout << "*******************************************************************" << endl;
 	
-	for (int i = 0, int sz = set_of_clauses.size(); i < sz; i++) {
-		for (int j = 0, int len = set_of_clauses[i]->numLiterals(); j < len; j++) {
-			int literal = set_of_clauses[i]->literals[j];
-			if (literal > 0) {
-				*(_variables.insert(Variable(literal))).getPOS().push_back(set_of_clauses[i]);
-			} else {
-				*(_variables.insert(Variable(-literal))).getNEG().push_back(set_of_clauses[i]);
-			}
-		}
-	}
+	SAT mainSAT;
+	
+	mainSAT.fillVariables(set_of_clauses);
 	
    // Solve SAT
-   DPLL(set_of_clauses);
+   outcome finish = mainSAT.DPLL(set_of_clauses);
 	
-	// TODO output processing
-
+	// output processing
+	ofstream outfile;
+	outfile.open ("output.txt");
+	outfile << "c The SAT Solution is:\n";
+	if (finish == SATISFIED) {
+		outfile << "s SATISFIABLE\n";
+		Valli<Variable>::iterator itr = mainSAT.getVarStart();
+		Valli<Variable>::iterator end = mainSAT.getVarEnd();
+		string varString = "v "; 
+		while (itr != end) {
+			unsigned var = (*itr).getValue();
+			int varS = ((*itr).getSetting() == 0) ? -var : var;
+								stringstream out;
+								out << varS;
+                        varString = varString + out.str() + " ";
+			++itr;
+		}
+		outfile << varString << "\n";
+	   outfile.close();
+		return 10;
+	} else if (finish == UNSATISFIED){
+		outfile << "s UNSATISFIABLE\n";
+	   outfile.close();
+		return 20;
+	} else {
+		outfile << "s UNKNOWN\n";
+	}
+	outfile.close();
    return 0;
 }

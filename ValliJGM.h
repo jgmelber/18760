@@ -145,7 +145,9 @@ class Valli {
 	  } else { itr = leftPost(milepost,item); }
 	  while (itr != end() && *itr < item) { itr++; } //linsearch to find item
       //WHILE LOOP ENS: *itr >= item
-      if(*itr != item) { insert(itr,item); } //private version
+      if(*itr != item) { 
+			insert(itr,item); //private version
+		} else { itr++; }
 	  if (tail->next != NULL) {
          cerr << "Uh-oh..." << endl;
       }
@@ -153,7 +155,7 @@ class Valli {
 	  if(iterator(milepost.at(0)) != begin()) { refresh(); }
       //refresh if size >= 2 * ratio * number of mileposts
       else if(size() >= 2*ratio*milepost.size()) { refresh(); }
-	  DNode<I>* prev = itr.curr->prev;
+	   DNode<I>* prev = itr.curr->prev;
       return iterator(prev);
    }
    

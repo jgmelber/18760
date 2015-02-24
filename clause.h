@@ -3,6 +3,7 @@
 
 #include <stack>
 #include <vector>
+#include <cmath>
 
 using std::vector;
 
@@ -15,7 +16,7 @@ class Clause {
   bool learned;
   int activity;
   //vector<Literal> literals;
-  vector<int> literals;
+  vector<int> literalVec;
 
 public:
      
@@ -23,17 +24,17 @@ public:
   Clause() 
 	  : learned(false)
      , activity(0)
-	  , literals(vector<int>())
+	  , literalVec(vector<int>())
   { }
   
   explicit Clause(vector<int> literals) 
 	  : learned(false)
 	  , activity(0)
-	  , literals(literals)
+	  , literalVec(literals)
   { }
   
   // This is the destructor for the Clause.
-  virtual ~Clause() { }
+  virtual ~Clause () { }
   
   // Will deal with learned, activity later...
   /*void setLearned(bool learned) {
@@ -42,24 +43,29 @@ public:
   
   bool isLearned() {return learned};*/
   
-  // These should be private but this works for now. 
-  unsigned val1 = 0;
-  unsigned val0 = 0;
-  
   //REQ: literal cannot be 0
   void addLiteral(int literal) {
   	  //literals.push_back(Literal(literal));
-  	  literals.push_back(literal);
+  	  literalVec.push_back(literal);
   }
   
   int numLiterals() {
-	  return literals.size();
+	  return literalVec.size();
   }
   
-  &vector<int> literals() {
-	  return literals;
+  int literals(int i) {
+	  return literalVec[i];
   }
-    
+  
+  string to_string() {
+	  string ret = "{";
+	  for (int i = 0, sz = literalVec.size(); i < sz; i++) {
+		  stringstream out;
+		  out << literalVec[i];
+		  ret = ret + out.str() + " ";
+	  }
+     return ret + "}";
+  }  
     
 
 };
@@ -116,56 +122,98 @@ class Variable
 			: value(0)
 			, setting(2)
 			, decisionLevel(-1)
-			, POS(vector<Clause *>)
-			, NEG(vector<Clause *>)
+			, POS(vector<Clause *>())
+			, NEG(vector<Clause *>())
 		{ }
 		
 		explicit Variable(int value)
 			: value(value)
 			, setting(2)
 			, decisionLevel(-1)
-			, POS(vector<Clause *>)
-			, NEG(vector<Clause *>)
+			, POS(vector<Clause *>())
+			, NEG(vector<Clause *>())
 		{ }
 		
-		virtual ~Variable ();
+		virtual ~Variable () { }
 		
-		inline bool operator< (const Variable& lhs, const Variable& rhs) { 
-		   return lhs.getValue() < rhs.getValue();
+		bool operator<(const Variable& rhs) const {
+			return value < rhs.getValue();
 		}
 		
-		int getValue() {
+		bool operator==(const Variable& rhs) const
+		{
+			return value == rhs.getValue();
+		}
+		
+		bool operator!=(const Variable& rhs) const
+		{
+			return value != rhs.getValue();
+		}
+		
+		int getValue() const {
 			return value;
 		}
 		
-		unsigned getSetting() {
+		int getSetting() {
 			return setting;
 		}
 		
-		void setSetting(unsigned setting) {
-			setting = setting;
+		void setSetting(unsigned sett) {
+			setting = sett;
 		}
 		
-		vector<Clause *> getPOS() {
-			return POS;
+		void push_backPOS(Clause *clause) {
+			POS.push_back(clause);
 		}
 		
-		vector<Clause *> getNEG() {
-			return NEG;
+		void push_backNEG(Clause *clause) {
+			NEG.push_back(clause);
+		}
+		
+		int scorePOS() {
+			int sum = 0;
+		   for (unsigned i = 0; i < POS.size(); i++){
+		   	sum += 1 / pow( 2, (POS[i]->numLiterals()) );
+		   }
+			return POS.size();	
+		}
+		
+		int scoreNEG() {
+			int sum = 0;
+		   for (unsigned i = 0; i < NEG.size(); i++){
+		   	sum += 1 / pow( 2, (NEG[i]->numLiterals()) );
+		   }
+			return NEG.size();	
 		}
 		
 		int getDecisionLevel() {
 			return decisionLevel;
 		}
 		
-		void setDecisionLevel(int decisionLevel) {
-			decisionLevel = decisionLevel;
+		void setDecisionLevel(int dLevel) {
+			decisionLevel = dLevel;
 			// Maybe need to set setting here also?
-			if (decisionLevel = -1) {
+			if (decisionLevel == -1) {
 				setting = 2;
 			}
 		}
 		
+	   string to_string() {
+	 	  string ret = "Variable: ";
+		  stringstream tt;
+		  tt << value;
+		  stringstream set;
+		  set << setting;
+ 		  ret = ret + tt.str() + " Set: " + set.str() + " POS: ";
+	 	  for (int i = 0, sz = POS.size(); i < sz; i++) {
+	 		  ret = ret + POS[i]->to_string() + " ";
+	 	  }
+		  ret = ret + "NEG: ";
+	 	  for (int i = 0, sz = NEG.size(); i < sz; i++) {
+	 		  ret = ret + NEG[i]->to_string() + " ";
+	 	  }
+	      return ret;
+	   }  
 
 };
 

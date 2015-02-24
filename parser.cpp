@@ -11,6 +11,7 @@
 using std::ifstream;
 #include <zlib.h>
 #include <cstdlib>
+#include <cstdio>
 
 //=====================================================================
 // DIMACS Parser:
